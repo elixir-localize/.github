@@ -68,3 +68,8 @@ Unfortunately all of that was based on a lack of understand of how exceptions ar
 In `Localize`, errors will be returned as `{:error, Exception.t}`, with the exception holding structured data about the error. And a user-readable message being generated as defined by `Exception.message/1`.
 
 This approach is much more idiomatic, gives more visibility to the developer about the error and paves the way for localized exception messages.
+
+## Additional tutorial documentation
+
+In the era of LLMs its very useful to have libraries document how-to information and implementation guidelines. `Localize` documentation will progressively improve to support better LLM engagement.
+
