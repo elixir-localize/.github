@@ -36,6 +36,18 @@ One of the benefits of the "backend" approach is that with metaprogramming we ca
 
 In `Localize`, we want to maintain the performance characteristics of compile-time code generation without the compile-time overhead.  On the basis that locales are loaded once and used many times, the same native Elixir code will be generated - but generated at runtime when the locale is being loaded.  This will mean there is some latency when a new locale is added to the system: the locale may have to be downloaded, then it has to be loaded into `:persistent_term` and then one or more modules will need to be compiled into the system to provide the required functions.  Early experiments suggests this is a reasonable tradeoff to gain faster compilation, simpler APIs and runtime configurability.
 
+### Locale loading and locale storage and access will be pluggable
+
+By default, locale data will be downloaded (from Github, and later CDN) on-demand at runtime and stored in [persistent_term](https://www.erlang.org/doc/apps/erts/persistent_term.html). For most use cases this is likely to be a good approach.
+
+Some use cases may benefit from alternative approaches to downloading locale data, storing it and accessing it.
+
+* Some devices are resource constrained. Locale data consumes approximately 1.6MB of persistent term storage. On a typical cloud server thats unlikely to be an issue but on an embedded device perhaps thats too much. A developer may choose to build a storage and access plugin to Localize that stores the data on an alternative storage device.
+
+* Some organizations may restrict access to public internet content for sensitive production applications. In that case, an organisation may build its own locale loader that downloads from an internal site - or potentially package locale data with its applications directly.
+
+* An organization may wish to change some of the CLDR locale data for its own use. While not recommended (its likely to be a maintenance nightmare), it will at least be possible by maintaining private copies of locale data.  Note that locale data formats usually change with each CLDR release.
+
 ## No compile-time configuration
 
 Since `ex_cldr` generates modules at compile time it uses compile-time configuration to specify a default locale, a json decoding library, the desired locales (in a backend module) and so on.
@@ -68,6 +80,12 @@ Unfortunately all of that was based on a lack of understand of how exceptions ar
 In `Localize`, errors will be returned as `{:error, Exception.t}`, with the exception holding structured data about the error. And a user-readable message being generated as defined by `Exception.message/1`.
 
 This approach is much more idiomatic, gives more visibility to the developer about the error and paves the way for localized exception messages.
+
+## Interactive Locale Explorer
+
+As part of Localize Web, a new web-based locale explorer will be provided that can be added to a Phoenix application. This liveview-based application will allow interactive exploration of locale data and show examples of the many capabilities that CLDR enables in Localize.
+
+At a later stage, a publically accessible version of the locale explorer will be available.
 
 ## Additional tutorial documentation
 
