@@ -75,7 +75,7 @@ For `Localize` the following packaging is anticipated:
 
 Today `ex_cldr` and friends standarize on returning `{:error, {exception_module, message_text}}`. This approach was adopted to keep the `{:error, term}` format common in Elixir but also returning a machine readable code (the exception module) and a human readable message.
 
-Unfortunately all of that was based on a lack of understand of how exceptions are structured in Elixir. A misunderstanding that goes back eight years.
+Unfortunately all of that was based on a lack of understanding of how exceptions are structured in Elixir. A misunderstanding that goes back eight years.
 
 In `Localize`, errors will be returned as `{:error, Exception.t}`, with the exception holding structured data about the error. And a user-readable message being generated as defined by `Exception.message/1`.
 
