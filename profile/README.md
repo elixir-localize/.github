@@ -67,7 +67,7 @@ For `Localize` the following packaging is anticipated:
 
 * `Localize` which includes the functionality of the existing `ex_cldr`, `ex_cldr_numbers`, `ex_cldr_dates_times`, `ex_cldr_calendars` (and dependent calendars), `ex_cldr_currencies`, `ex_cldr_units`, `ex_cldr_person_names`, `ex_cldr_locale_display`, `ex_cldr_messages`, `ex_cldr_lists`, `ex_cldr_languages`, `ex_cldr_territories`.
 
-* `Localize_web` which includes the functionality of `ex_cldr_routes`, `ex_cldr_plugs` and `ex_cldr_html`.
+* `Localize_web` which includes the functionality of `ex_cldr_routes`, `ex_cldr_plugs` and `ex_cldr_html`. It will also include the new locale explorer Phoenix application.
 
 * `Localize_sql` which includes the functionality of `ex_units_sql`, `ex_cldr_trans`.
 
@@ -90,4 +90,10 @@ At a later stage, a publically accessible version of the locale explorer will be
 ## Additional tutorial documentation
 
 In the era of LLMs its very useful to have libraries document how-to information and implementation guidelines. `Localize` documentation will progressively improve to support better LLM engagement.
+
+## Elixir support
+
+Currently `ex_cldr` supports Elixir ~> 1.12 (from 2021) which means there is release specific conditional code in several places. Localize will target support at Elixir ~> 1.17 with a possibility of tightening even further to a minimum of Elixir ~> 1.18. By the time of first public release that would mean the supported Elixir versions would be 1.17 (maybe), 1.18, 1.19 and 1.20.
+
+
 
