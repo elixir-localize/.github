@@ -95,5 +95,9 @@ In the era of LLMs its very useful to have libraries document how-to information
 
 Currently `ex_cldr` supports Elixir ~> 1.12 (from 2021) which means there is release specific conditional code in several places. Localize will target support at Elixir ~> 1.17 with a possibility of tightening even further to a minimum of Elixir ~> 1.18. By the time of first public release that would mean the supported Elixir versions would be 1.17 (maybe), 1.18, 1.19 and 1.20.
 
+## OTP Support
+
+Localize is targetting to support OTP 26 and later.
+
 
 
