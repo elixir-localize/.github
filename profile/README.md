@@ -2,6 +2,48 @@
 
 `Localize` is a localization library leveraging the content built and maintained by [Unicode's](unicode.org) [CLDR](https://cldr.unicode.org) project.  It is the next-generation version of [ex_cldr](https://github.com/elixir-cldr).
 
+## Updated Status April 2nd 2026
+
+New major releases of `localize`, `calendrical` and `ex_money` will be available for testing before the end of April 2026.
+
+### Development status and packaging
+
+* All primary ex_cldr libraries are migrated and unified into `localize`. The integrated libraries are:
+  * `ex_cldr`
+  * `ex_cldr_currencies`
+  * `ex_cldr_numbers`
+  * `ex_cldr_dates_times`
+  * `ex_cldr_units`
+  * `ex_cldr_lists`
+  * `ex_cldr_locale_display`
+  * `ex_cldr_messages`
+  
+* All calendar-related libraries are unified under a the library `calendrical` that includes the content of
+  * `ex_cldr_calendar`
+  * `ex_cldr_calendar_coptic`
+  * `ex_cldr_calendar_ethiopic`
+  * `ex_cldr_calendar_japanese`
+  * `ex_cldr_calendar_lunisolar`
+  * `ex_cldr_calendar_persian`
+  * `ex_cldr_calendar_composite`
+  * `ex_cldr_calendar_format`
+  
+* `ex_money` version 6.0.0 is migrated to `localize` and tests are passing.
+
+* Additional work is still required to build the `localize_web` library which will combine:
+  * `ex_cldr_plugs`
+  * `ex_cldr_html`
+  * `ex_cldr_routes`
+  
+* Some adaptation is required for `ex_money_sql` and `ex_cldr_units_sql`, primarily because of struct name differences.
+
+* Work has not yet started on migration `ex_cldr_person_name` but that should still make the end of April timeline.
+
+### Elixir and OTP support
+
+* `localize` is supported on Elixir 1.17+ and OTP 26+
+* All tests (> 24,000) and dialyzer are passing today
+
 ## Status
 
 `Localize` is under active development with a first version expected to be available for use by the end of March 2026.  Not all functionality of `ex_cldr` will be available in the first release.
