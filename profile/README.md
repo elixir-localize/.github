@@ -2,6 +2,16 @@
 
 `Localize` is a localization library leveraging the content built and maintained by [Unicode's](unicode.org) [CLDR](https://cldr.unicode.org) project.  It is the next-generation version of [ex_cldr](https://github.com/elixir-cldr).
 
+
+## Updated Status April 3rd, 2026
+
+* A new library is nearing readiness. `intl` is a wrapper around Localize to provide an API that mirrors the Javascript [Intl](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl) module.
+
+* `localize_web` now code-complete and tests are passing. More validation and documentation work is required. This library combines:
+  * `ex_cldr_plugs`
+  * `ex_cldr_html`
+  * `ex_cldr_routes`
+  
 ## Updated Status April 2nd 2026
 
 New major releases of `localize`, `calendrical` and `ex_money` will be available for testing before the end of April 2026.
