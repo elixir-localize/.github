@@ -1,0 +1,13 @@
+_build/
+deps/
+*.ez
+.elixir_ls/
+.lexical/
+erl_crash.dump
+
+# Generated site output
+_site/
+
+# Local env
+.env
+.env.*
