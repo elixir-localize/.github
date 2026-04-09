@@ -4,7 +4,7 @@ defmodule ElixirLocalize.Generator do
   self-contained website into the output directory (defaults to `_site/`).
   """
 
-  alias ElixirLocalize.{Rss, Templates}
+  alias ElixirLocalize.{Rss, Sitemap, Templates}
 
   @default_output "_site"
 
@@ -40,12 +40,20 @@ defmodule ElixirLocalize.Generator do
     written_posts = Enum.map(published, &write_post(output_dir, site, &1))
     written_categories = write_category_pages(output_dir, site, published)
     written_colophon = write(output_dir, "colophon/index.html", Templates.colophon(site))
+    written_404 = write(output_dir, "404.html", Templates.not_found(site))
     written_feed = write(output_dir, "feed.xml", Rss.feed(published, site))
-    written_robots = write(output_dir, "robots.txt", robots_txt())
+    written_sitemap = write(output_dir, "sitemap.xml", Sitemap.generate(published, site))
+    written_robots = write(output_dir, "robots.txt", robots_txt(site))
 
     all =
-      [written_index, written_colophon, written_feed, written_robots] ++
-        written_posts ++ written_categories ++ written_static
+      [
+        written_index,
+        written_colophon,
+        written_404,
+        written_feed,
+        written_sitemap,
+        written_robots
+      ] ++ written_posts ++ written_categories ++ written_static
 
     {:ok,
      %{
@@ -126,10 +134,14 @@ defmodule ElixirLocalize.Generator do
     {path, byte_size(content)}
   end
 
-  defp robots_txt do
+  defp robots_txt(site) do
+    base_url = String.trim_trailing(site[:base_url], "/")
+
     """
     User-agent: *
     Allow: /
+
+    Sitemap: #{base_url}/sitemap.xml
     """
   end
 

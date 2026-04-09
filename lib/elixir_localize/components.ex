@@ -29,9 +29,26 @@ defmodule ElixirLocalize.Components do
   attr(:canonical, :string, required: true)
   attr(:site, :any, required: true)
   attr(:page_kind, :atom, default: :post)
+  attr(:og_type, :string, default: "website")
+  attr(:og_image, :string, default: nil)
+  attr(:published_at, :any, default: nil)
+  attr(:updated_at, :any, default: nil)
+  attr(:article_author, :string, default: nil)
+  attr(:article_tags, :list, default: [])
+  attr(:structured_data, :list, default: [])
   slot(:inner_block, required: true)
 
   def layout(assigns) do
+    assigns =
+      assigns
+      |> assign_new(:resolved_og_image, fn ->
+        assigns.og_image ||
+          String.trim_trailing(assigns.site[:base_url], "/") <> "/logo.png"
+      end)
+      |> assign_new(:structured_data_html, fn ->
+        structured_data_tags(assigns.structured_data)
+      end)
+
     ~H"""
     <!DOCTYPE html>
     <html lang={@site[:language]} data-theme="light">
@@ -40,11 +57,48 @@ defmodule ElixirLocalize.Components do
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <title>{@title}</title>
         <meta name="description" content={@description} />
+        <meta name="theme-color" content="#fbfaf7" media="(prefers-color-scheme: light)" />
+        <meta name="theme-color" content="#15121a" media="(prefers-color-scheme: dark)" />
+        <meta name="author" content={@site[:author]} />
+        <meta name="generator" content="ElixirLocalize blog engine" />
         <link rel="canonical" href={@canonical} />
         <link rel="alternate" type="application/rss+xml" title={@site[:title] <> " — RSS"} href="/feed.xml" />
         <link rel="micropub" href={@site[:micropub_url]} />
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+        <link rel="apple-touch-icon" href="/logo.png" />
+        <link rel="manifest" href="/manifest.webmanifest" />
         <link rel="stylesheet" href="/css/site.css" />
+
+        <meta property="og:type" content={@og_type} />
+        <meta property="og:site_name" content={@site[:title]} />
+        <meta property="og:title" content={@title} />
+        <meta property="og:description" content={@description} />
+        <meta property="og:url" content={@canonical} />
+        <meta property="og:locale" content={og_locale(@site[:language])} />
+        <meta property="og:image" content={@resolved_og_image} />
+
+        <%= if @og_type == "article" do %>
+          <meta
+            :if={match?(%DateTime{}, @published_at)}
+            property="article:published_time"
+            content={DateTime.to_iso8601(@published_at)}
+          />
+          <meta
+            :if={match?(%DateTime{}, @updated_at)}
+            property="article:modified_time"
+            content={DateTime.to_iso8601(@updated_at)}
+          />
+          <meta :if={@article_author} property="article:author" content={@article_author} />
+          <meta :for={tag <- @article_tags} property="article:tag" content={tag} />
+        <% end %>
+
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={@title} />
+        <meta name="twitter:description" content={@description} />
+        <meta name="twitter:image" content={@resolved_og_image} />
+
+        {Phoenix.HTML.raw(@structured_data_html)}
+
         <script>
           (function () {
             try {
@@ -162,5 +216,29 @@ defmodule ElixirLocalize.Components do
     ~H"""
     <p class="site-title"><a href="/">{@site[:title]}</a></p>
     """
+  end
+
+  # Open Graph locales are formatted as IETF language tags with an
+  # underscore separator between language and region. The simple
+  # two-letter locale we use in :site[:language] maps to a reasonable
+  # default region; edit here if you need something more specific.
+  defp og_locale("en"), do: "en_GB"
+  defp og_locale("en_GB"), do: "en_GB"
+  defp og_locale("en_US"), do: "en_US"
+  defp og_locale(other) when is_binary(other), do: String.replace(other, "-", "_")
+  defp og_locale(_), do: "en_GB"
+
+  # HEEx treats the body of a <script> element as raw text — {} / <%= %>
+  # interpolations inside are not evaluated. To emit JSON-LD we
+  # pre-render the full <script>…</script> blocks as a single binary and
+  # inject it via Phoenix.HTML.raw/1.
+  defp structured_data_tags([]), do: ""
+
+  defp structured_data_tags(payloads) when is_list(payloads) do
+    payloads
+    |> Enum.map(fn payload ->
+      ~s(<script type="application/ld+json">#{payload}</script>)
+    end)
+    |> Enum.join("\n")
   end
 end

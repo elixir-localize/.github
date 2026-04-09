@@ -474,6 +474,7 @@ main:focus {
   line-height: 1.2;
   margin: 0 0 var(--space-2);
   font-weight: 600;
+  color: var(--link);
 }
 
 .post-body {

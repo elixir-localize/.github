@@ -8,6 +8,7 @@ defmodule ElixirLocalize.Templates do
 
   alias ElixirLocalize.Components
   alias ElixirLocalize.Post
+  alias ElixirLocalize.SEO
 
   @doc """
   Render the blog index page listing all posts.
@@ -26,7 +27,11 @@ defmodule ElixirLocalize.Templates do
   """
   @spec index([Post.t()], keyword()) :: binary()
   def index(posts, site) do
-    assigns = %{posts: posts, site: site}
+    assigns = %{
+      posts: posts,
+      site: site,
+      structured_data: [SEO.json_ld_website(site)]
+    }
 
     render(~H"""
     <Components.layout
@@ -35,6 +40,8 @@ defmodule ElixirLocalize.Templates do
       canonical={@site[:base_url] <> "/"}
       site={@site}
       page_kind={:index}
+      og_type="website"
+      structured_data={@structured_data}
     >
       <ol class="post-list" aria-label="Blog posts">
         <li :for={post <- @posts} class="post-list-item">
@@ -83,7 +90,14 @@ defmodule ElixirLocalize.Templates do
   """
   @spec post(Post.t(), keyword()) :: binary()
   def post(post, site) do
-    assigns = %{post: post, site: site}
+    assigns = %{
+      post: post,
+      site: site,
+      structured_data: [
+        SEO.json_ld_blog_posting(post, site),
+        SEO.json_ld_breadcrumbs_for_post(post, site)
+      ]
+    }
 
     render(~H"""
     <Components.layout
@@ -92,6 +106,12 @@ defmodule ElixirLocalize.Templates do
       canonical={@site[:base_url] <> "/posts/" <> @post.slug <> "/"}
       site={@site}
       page_kind={:post}
+      og_type="article"
+      published_at={@post.published_at}
+      updated_at={@post.updated_at}
+      article_author={@post.author}
+      article_tags={@post.tags}
+      structured_data={@structured_data}
     >
       <article class="post">
         <header class="post-header">
@@ -132,7 +152,17 @@ defmodule ElixirLocalize.Templates do
   @spec category(String.t(), [Post.t()], keyword()) :: binary()
   def category(tag, posts, site) do
     slug = ElixirLocalize.Post.tag_slug(tag)
-    assigns = %{tag: tag, posts: posts, site: site, slug: slug}
+
+    assigns = %{
+      tag: tag,
+      posts: posts,
+      site: site,
+      slug: slug,
+      structured_data: [
+        SEO.json_ld_collection_page(tag, posts, site),
+        SEO.json_ld_breadcrumbs_for_category(tag, site)
+      ]
+    }
 
     render(~H"""
     <Components.layout
@@ -141,6 +171,7 @@ defmodule ElixirLocalize.Templates do
       canonical={@site[:base_url] <> "/categories/" <> @slug <> "/"}
       site={@site}
       page_kind={:post}
+      structured_data={@structured_data}
     >
       <header class="category-header">
         <p class="category-eyebrow">Category</p>
@@ -280,6 +311,50 @@ defmodule ElixirLocalize.Templates do
         </div>
         <hr />
         <p class="post-nav"><a href="/">← Back to home</a></p>
+      </article>
+    </Components.layout>
+    """)
+  end
+
+  @doc """
+  Render the 404 "not found" page.
+
+  ### Arguments
+
+  * `site` is the site configuration keyword list.
+
+  ### Returns
+
+  * A binary containing the full HTML document.
+
+  """
+  @spec not_found(keyword()) :: binary()
+  def not_found(site) do
+    assigns = %{site: site}
+
+    render(~H"""
+    <Components.layout
+      title={"Not found — " <> @site[:title]}
+      description="The page you are looking for could not be found."
+      canonical={@site[:base_url] <> "/404.html"}
+      site={@site}
+      page_kind={:post}
+    >
+      <article class="post">
+        <header class="post-header">
+          <h1 class="post-title">Page not found</h1>
+          <p class="post-meta">We couldn't find the page you were looking for.</p>
+        </header>
+        <div class="post-body">
+          <p>
+            The page may have been moved, renamed, or it might never have existed. Try one of these instead:
+          </p>
+          <ul>
+            <li><a href="/">Return to the home page</a></li>
+            <li><a href="/feed.xml">Subscribe to the RSS feed</a></li>
+            <li><a href="/colophon/">Read the colophon</a></li>
+          </ul>
+        </div>
       </article>
     </Components.layout>
     """)

@@ -1,0 +1,26 @@
+{
+  "name": "Localize",
+  "short_name": "Localize",
+  "description": "Next-generation localization for Elixir.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "minimal-ui",
+  "orientation": "portrait-primary",
+  "background_color": "#fbfaf7",
+  "theme_color": "#5b2a86",
+  "lang": "en",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/logo.png",
+      "sizes": "1200x1200",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
