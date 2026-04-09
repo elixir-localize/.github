@@ -22,23 +22,30 @@ defmodule ElixirLocalize.Generator do
     with counts of the files written and their total size.
 
   """
-  @spec build(Path.t()) :: {:ok, map()}
-  def build(output_dir \\ @default_output) do
+  @spec build(Path.t(), [ElixirLocalize.Post.t()] | nil) :: {:ok, map()}
+  def build(output_dir \\ @default_output, posts \\ nil) do
     output_dir = Path.expand(output_dir)
-    site = ElixirLocalize.site_config()
-    posts = ElixirLocalize.all_posts()
+    site = site_config_with_micropub()
+
+    # Drafts stay in `priv/posts/` and are visible to editing clients via
+    # the XML-RPC / Micropub endpoints, but they are never rendered into
+    # the published site.
+    published =
+      (posts || ElixirLocalize.all_posts())
+      |> Enum.filter(&(&1.status == :published))
 
     reset_output!(output_dir)
     written_static = copy_static(output_dir)
-    written_index = write(output_dir, "index.html", Templates.index(posts, site))
-    written_posts = Enum.map(posts, &write_post(output_dir, site, &1))
+    written_index = write(output_dir, "index.html", Templates.index(published, site))
+    written_posts = Enum.map(published, &write_post(output_dir, site, &1))
+    written_categories = write_category_pages(output_dir, site, published)
     written_colophon = write(output_dir, "colophon/index.html", Templates.colophon(site))
-    written_feed = write(output_dir, "feed.xml", Rss.feed(posts, site))
+    written_feed = write(output_dir, "feed.xml", Rss.feed(published, site))
     written_robots = write(output_dir, "robots.txt", robots_txt())
 
     all =
       [written_index, written_colophon, written_feed, written_robots] ++
-        written_posts ++ written_static
+        written_posts ++ written_categories ++ written_static
 
     {:ok,
      %{
@@ -46,6 +53,13 @@ defmodule ElixirLocalize.Generator do
        files: length(all),
        bytes: Enum.sum(Enum.map(all, fn {_path, bytes} -> bytes end))
      }}
+  end
+
+  defp site_config_with_micropub do
+    site = ElixirLocalize.site_config()
+    default = String.trim_trailing(site[:base_url], "/") <> "/micropub"
+    micropub_url = Application.get_env(:elixir_localize, :micropub_url, default)
+    Keyword.put(site, :micropub_url, micropub_url)
   end
 
   defp reset_output!(dir) do
@@ -74,6 +88,35 @@ defmodule ElixirLocalize.Generator do
   defp write_post(output_dir, site, post) do
     rel = Path.join(["posts", post.slug, "index.html"])
     write(output_dir, rel, Templates.post(post, site))
+  end
+
+  # Collect every distinct tag used across published posts and render a
+  # category page per tag at `_site/categories/<slug>/index.html`. Each
+  # page lists the posts in that category, newest-first. Tags that map to
+  # the same slug (e.g. "ex_cldr" and "ex-cldr") are merged; the display
+  # name used on the page is the one that comes first alphabetically, for
+  # determinism.
+  defp write_category_pages(output_dir, site, posts) do
+    posts
+    |> Enum.flat_map(fn post -> Enum.map(post.tags, &{&1, post}) end)
+    |> Enum.group_by(
+      fn {tag, _post} -> ElixirLocalize.Post.tag_slug(tag) end,
+      fn {tag, post} -> {tag, post} end
+    )
+    |> Enum.reject(fn {slug, _entries} -> slug == "" end)
+    |> Enum.map(fn {slug, entries} ->
+      display_tag =
+        entries |> Enum.map(fn {tag, _post} -> tag end) |> Enum.sort() |> List.first()
+
+      tagged_posts =
+        entries
+        |> Enum.map(fn {_tag, post} -> post end)
+        |> Enum.uniq_by(& &1.slug)
+        |> Enum.sort_by(& &1.date, {:desc, Date})
+
+      rel = Path.join(["categories", slug, "index.html"])
+      write(output_dir, rel, Templates.category(display_tag, tagged_posts, site))
+    end)
   end
 
   defp write(output_dir, relative, content) do

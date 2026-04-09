@@ -154,6 +154,38 @@ main:focus {
   margin: 0 auto;
 }
 
+.masthead-heading {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+}
+
+.site-logo-link {
+  display: inline-flex;
+  flex-shrink: 0;
+  border-radius: 6px;
+}
+
+.site-logo-link:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.site-logo {
+  display: block;
+  width: auto;
+  /* Matches the combined height of .site-title + .tagline so the logo's
+     top edge aligns with the title and its bottom edge aligns with the
+     tagline baseline. */
+  height: 4.25rem;
+}
+
+.masthead-text {
+  min-width: 0;
+  flex: 1;
+}
+
 .site-title {
   font-family: var(--font-title);
   font-weight: 600;
@@ -176,7 +208,7 @@ main:focus {
 .tagline {
   font-style: italic;
   color: var(--text-muted);
-  margin: var(--space-1) 0 var(--space-3);
+  margin: var(--space-1) 0 0;
   font-size: 0.95rem;
 }
 
@@ -317,28 +349,11 @@ main:focus {
 .post-list-item {
   padding-bottom: var(--space-5);
   margin-bottom: var(--space-5);
-  border-bottom: 1px solid var(--rule);
-  position: relative;
-}
-
-.post-list-item::after {
-  content: "★";
-  position: absolute;
-  bottom: -0.85em;
-  left: 50%;
-  transform: translateX(-50%);
-  background: var(--bg);
-  color: var(--text-muted);
-  padding: 0 0.6em;
-  font-size: 0.9rem;
 }
 
 .post-list-item:last-child {
-  border-bottom: 0;
-}
-
-.post-list-item:last-child::after {
-  display: none;
+  padding-bottom: 0;
+  margin-bottom: 0;
 }
 
 .post-list-title {
@@ -376,6 +391,75 @@ main:focus {
 
 .post-summary {
   margin: var(--space-2) 0 0;
+}
+
+/* ---------- Category tags ---------- */
+
+.post-tags {
+  margin: var(--space-3) 0 0;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-family: var(--font-title);
+  line-height: 1.4;
+}
+
+.post-tags-label {
+  margin-right: 0.3em;
+  font-variant-caps: all-small-caps;
+  letter-spacing: 0.04em;
+  font-weight: 600;
+}
+
+.post-tag {
+  color: var(--link);
+  text-decoration: none;
+  border-bottom: 1px dotted currentColor;
+  padding-bottom: 0.05em;
+}
+
+.post-tag:hover,
+.post-tag:focus-visible {
+  color: var(--link-hover);
+  border-bottom-style: solid;
+}
+
+.post-tag:visited {
+  color: var(--link-visited);
+}
+
+.post-tags-sep {
+  color: var(--text-muted);
+}
+
+/* Category landing page */
+.category-header {
+  margin-bottom: var(--space-5);
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--rule);
+}
+
+.category-eyebrow {
+  font-family: var(--font-title);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  margin: 0 0 var(--space-1);
+}
+
+.category-title {
+  font-family: var(--font-title);
+  font-size: 2rem;
+  font-weight: 600;
+  margin: 0 0 var(--space-1);
+  line-height: 1.1;
+  color: var(--accent);
+}
+
+.category-count {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.9rem;
 }
 
 /* ---------- Post page ---------- */
@@ -575,4 +659,6 @@ main:focus {
   .site-title { font-size: 1.75rem; }
   .post-title { font-size: 1.5rem; }
   .masthead { padding: var(--space-4) var(--space-3) var(--space-3); }
+  .site-logo { height: 3.5rem; }
+  .masthead-heading { gap: var(--space-2); }
 }

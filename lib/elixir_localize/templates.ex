@@ -44,15 +44,27 @@ defmodule ElixirLocalize.Templates do
             </h2>
             <p class="post-meta">
               <time datetime={Date.to_iso8601(post.date)}>{format_date(post.date)}</time>
-              <span class="sep" aria-hidden="true">·</span>
-              <span>{post.author}</span>
             </p>
             <p class="post-summary">{post.summary}</p>
+            <.post_tags tags={post.tags} />
           </article>
         </li>
       </ol>
     </Components.layout>
     """)
+  end
+
+  attr :tags, :list, required: true
+
+  defp post_tags(%{tags: []} = assigns), do: ~H""
+
+  defp post_tags(assigns) do
+    ~H"""
+    <p class="post-tags" aria-label="Categories">
+      <span class="post-tags-label">Filed under:</span>
+      <%= for {tag, index} <- Enum.with_index(@tags) do %><%= if index > 0 do %><span class="post-tags-sep" aria-hidden="true">, </span><% end %><a class="post-tag" href={"/categories/" <> ElixirLocalize.Post.tag_slug(tag) <> "/"}>{tag}</a><% end %>
+    </p>
+    """
   end
 
   @doc """
@@ -86,16 +98,74 @@ defmodule ElixirLocalize.Templates do
           <h1 class="post-title">{@post.title}</h1>
           <p class="post-meta">
             <time datetime={Date.to_iso8601(@post.date)}>{format_date(@post.date)}</time>
-            <span class="sep" aria-hidden="true">·</span>
-            <span>{@post.author}</span>
           </p>
         </header>
         <div class="post-body">
           {Phoenix.HTML.raw(@post.body)}
         </div>
+        <.post_tags tags={@post.tags} />
         <hr />
         <p class="post-nav"><a href="/">← Back to home</a></p>
       </article>
+    </Components.layout>
+    """)
+  end
+
+  @doc """
+  Render a category page listing every published post tagged with a given
+  tag.
+
+  ### Arguments
+
+  * `tag` is the original (non-slugified) tag string.
+
+  * `posts` is the list of posts to render, already filtered to this tag and
+    sorted newest-first.
+
+  * `site` is the site configuration keyword list.
+
+  ### Returns
+
+  * A binary containing the full HTML document.
+
+  """
+  @spec category(String.t(), [Post.t()], keyword()) :: binary()
+  def category(tag, posts, site) do
+    slug = ElixirLocalize.Post.tag_slug(tag)
+    assigns = %{tag: tag, posts: posts, site: site, slug: slug}
+
+    render(~H"""
+    <Components.layout
+      title={"Category: " <> @tag <> " — " <> @site[:title]}
+      description={"All posts in the " <> @tag <> " category."}
+      canonical={@site[:base_url] <> "/categories/" <> @slug <> "/"}
+      site={@site}
+      page_kind={:post}
+    >
+      <header class="category-header">
+        <p class="category-eyebrow">Category</p>
+        <h1 class="category-title">{@tag}</h1>
+        <p class="category-count">
+          {length(@posts)} {if length(@posts) == 1, do: "post", else: "posts"}
+        </p>
+      </header>
+
+      <ol class="post-list" aria-label={"Posts in " <> @tag}>
+        <li :for={post <- @posts} class="post-list-item">
+          <article>
+            <h2 class="post-list-title">
+              <a href={"/posts/" <> post.slug <> "/"}>{post.title}</a>
+            </h2>
+            <p class="post-meta">
+              <time datetime={Date.to_iso8601(post.date)}>{format_date(post.date)}</time>
+            </p>
+            <p class="post-summary">{post.summary}</p>
+          </article>
+        </li>
+      </ol>
+
+      <hr />
+      <p class="post-nav"><a href="/">← Back to home</a></p>
     </Components.layout>
     """)
   end

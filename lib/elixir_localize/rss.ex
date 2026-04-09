@@ -52,7 +52,7 @@ defmodule ElixirLocalize.Rss do
 
   defp item(%Post{} = post, base_url) do
     url = base_url <> "/posts/" <> post.slug <> "/"
-    pub_date = post.date |> DateTime.new!(~T[12:00:00]) |> rfc2822()
+    pub_date = rfc2822(post.published_at)
 
     """
         <item>

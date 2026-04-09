@@ -31,7 +31,10 @@ defmodule ElixirLocalize.MixProject do
       {:phoenix_live_view, "~> 1.0"},
       {:phoenix_html, "~> 4.1"},
       {:req, "~> 0.5"},
-      {:aws_signature, "~> 0.3"}
+      {:aws_signature, "~> 0.3"},
+      {:bandit, "~> 1.5"},
+      {:plug, "~> 1.16"},
+      {:xmlrpc, "~> 1.4"}
     ]
   end
 end

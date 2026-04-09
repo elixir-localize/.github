@@ -1,11 +1,12 @@
 %{
   title: "Twenty-eight into three: why Localize collapses the ex_cldr family",
   author: "Kip Cole",
-  tags: ~w(localize packaging ex_cldr),
-  description: "Eight years of ex_cldr produced twenty-eight packages. Localize collapses them into three. Here is what changes, and why."
+  tags: ["ex_cldr", "localize", "packaging"],
+  description: "Eight years of ex_cldr produced twenty-eight packages. Localize collapses them into three. Here is what changes, and why.",
+  updated: "2026-04-09T18:48:16Z"
 }
 ---
-
+EDIT EDIT AGAIN EDIT
 When I started `ex_cldr` in 2018 the plan was modest: wrap the Unicode CLDR data in a way Elixir applications could actually use. Eight years later there are [twenty-eight repositories](https://github.com/orgs/elixir-cldr/repositories) in the org. That's the kind of number that demands an explanation.
 
 ## How we got here

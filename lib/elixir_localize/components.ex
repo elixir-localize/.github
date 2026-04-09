@@ -42,6 +42,7 @@ defmodule ElixirLocalize.Components do
         <meta name="description" content={@description} />
         <link rel="canonical" href={@canonical} />
         <link rel="alternate" type="application/rss+xml" title={@site[:title] <> " — RSS"} href="/feed.xml" />
+        <link rel="micropub" href={@site[:micropub_url]} />
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
         <link rel="stylesheet" href="/css/site.css" />
         <script>
@@ -60,8 +61,15 @@ defmodule ElixirLocalize.Components do
 
         <header class="masthead" role="banner">
           <div class="masthead-inner">
-            <.site_title page_kind={@page_kind} site={@site} />
-            <p class="tagline">{@site[:tagline]}</p>
+            <div class="masthead-heading">
+              <a class="site-logo-link" href="/" aria-label={@site[:title] <> " home"}>
+                <img class="site-logo" src="/logo.png" alt="" width="160" height="160" />
+              </a>
+              <div class="masthead-text">
+                <.site_title page_kind={@page_kind} site={@site} />
+                <p class="tagline">{@site[:tagline]}</p>
+              </div>
+            </div>
             <nav class="primary-nav" aria-label="Primary">
               <a href="/">Home</a>
               <a href="/feed.xml">RSS</a>

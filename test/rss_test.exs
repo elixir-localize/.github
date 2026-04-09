@@ -22,7 +22,10 @@ defmodule ElixirLocalize.RssTest do
       body: "<p>Body & stuff</p>",
       description: nil,
       tags: [],
-      summary: "A summary with <tags> & ampersands"
+      summary: "A summary with <tags> & ampersands",
+      status: :published,
+      published_at: ~U[2026-04-09 12:00:00Z],
+      updated_at: ~U[2026-04-09 12:00:00Z]
     }
   end
 
