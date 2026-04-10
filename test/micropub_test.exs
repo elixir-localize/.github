@@ -140,8 +140,19 @@ defmodule ElixirLocalize.MicropubTest do
       assert File.read!(path) =~ "Hello from the test suite."
     end
 
-    test "rejects create without title" do
-      assert {:error, :title_required} = Micropub.create(%{content: "no title"})
+    test "creates a post without explicit title using generated title" do
+      slug = "test-micropub-notitle-#{System.unique_integer([:positive])}"
+
+      assert {:ok, url} =
+               Micropub.create(%{content: "Auto-titled post body.", slug: slug})
+
+      assert url =~ "/posts/#{slug}/"
+
+      path = ElixirLocalize.RuntimePosts.path_for_slug(slug)
+      assert path != nil
+      source = File.read!(path)
+      assert source =~ "Auto-titled post body"
+      assert source =~ "title:"
     end
 
     test "rejects create without content" do

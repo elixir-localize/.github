@@ -102,8 +102,8 @@ defmodule ElixirLocalize.Micropub do
   """
   @spec create(properties()) :: {:ok, String.t()} | {:error, atom()}
   def create(properties) do
-    with {:ok, title} <- fetch(properties, :title, :title_required),
-         {:ok, content} <- fetch(properties, :content, :content_required) do
+    with {:ok, content} <- fetch(properties, :content, :content_required) do
+      title = Map.get(properties, :title) || title_from_content(content)
       date = Map.get(properties, :date, Date.utc_today())
       slug = Map.get(properties, :slug) || slugify(title)
 
@@ -571,6 +571,19 @@ defmodule ElixirLocalize.Micropub do
 
   defp maybe_list(nil), do: []
   defp maybe_list(value), do: [value]
+
+  defp title_from_content(content) when is_binary(content) do
+    content
+    |> String.replace(~r/[#*`\[\]]+/, "")
+    |> String.split(~r/[\n.!?]/, parts: 2, trim: true)
+    |> List.first("")
+    |> String.trim()
+    |> String.slice(0, 80)
+    |> case do
+      "" -> "Post #{Date.to_iso8601(Date.utc_today())}"
+      title -> title
+    end
+  end
 
   defp default_author do
     ElixirLocalize.site_config()[:author] || "Kip Cole"

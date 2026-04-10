@@ -1,28 +1,44 @@
 defmodule ElixirLocalize.Web.Server do
   @moduledoc """
-  Starts Bandit serving the `ElixirLocalize.Web.Router` on the configured
-  port for the Micropub editing workflow.
+  Builds supervisor child specs for the two Bandit servers that
+  `mix blog.server` starts:
 
-  The server is not started automatically with the application — it is only
-  brought up by `mix blog.server`. That keeps the library usable as a
-  build-only tool when the server is not wanted.
+  * **API server** (`ElixirLocalize.Web.Router`) on port 4010 — Micropub +
+    XML-RPC endpoints for MarsEdit.
+  * **Preview server** (`ElixirLocalize.Web.PreviewRouter`) on port 4000 —
+    static file serving of `_site/` for local browser preview.
+
+  Neither server is started automatically with the application — they are
+  only brought up by `mix blog.server`.
   """
 
   @doc """
-  Build a child spec for the Bandit server on the given port.
+  Return a list of child specs for both the API and preview servers.
 
   ### Arguments
 
-  * `port` is the TCP port to listen on. Defaults to `4010` to avoid
-    colliding with `mix blog.serve`, which uses `4000`.
+  * `api_port` is the TCP port for the Micropub/XML-RPC server.
+    Defaults to `4010`.
+
+  * `preview_port` is the TCP port for the static preview server.
+    Defaults to `4000`.
 
   ### Returns
 
-  * A supervisor child spec.
+  * A list of two supervisor child specs.
 
   """
-  @spec child_spec(non_neg_integer()) :: Supervisor.child_spec()
-  def child_spec(port \\ 4010) do
-    {Bandit, plug: ElixirLocalize.Web.Router, port: port, scheme: :http}
+  @spec child_specs(non_neg_integer(), non_neg_integer()) :: [Supervisor.child_spec()]
+  def child_specs(api_port \\ 4010, preview_port \\ 4000) do
+    [
+      Supervisor.child_spec(
+        {Bandit, plug: ElixirLocalize.Web.Router, port: api_port, scheme: :http},
+        id: :api_server
+      ),
+      Supervisor.child_spec(
+        {Bandit, plug: ElixirLocalize.Web.PreviewRouter, port: preview_port, scheme: :http},
+        id: :preview_server
+      )
+    ]
   end
 end

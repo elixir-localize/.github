@@ -1,10 +1,13 @@
 defmodule Mix.Tasks.Blog.Server do
-  @shortdoc "Run the Micropub editing server (for MarsEdit, micro.blog, etc.)"
+  @shortdoc "Run the blog preview and Micropub editing servers"
   @moduledoc """
-  Starts a Bandit server that exposes the Micropub endpoint for editing the
-  blog from external clients such as MarsEdit.
+  Starts two Bandit servers from a single supervisor:
 
-      mix blog.server [--port 4010]
+  * **Preview server** on port 4000 — serves the built `_site/` directory
+    for local browser preview. Replaces `mix blog.serve` in most workflows.
+  * **API server** on port 4010 — Micropub + XML-RPC endpoint for MarsEdit.
+
+      mix blog.server [--api-port 4010] [--preview-port 4000]
 
   Before running, set a bearer token in the environment:
 
@@ -15,6 +18,8 @@ defmodule Mix.Tasks.Blog.Server do
   * System → Micropub
   * Endpoint: `http://localhost:4010/micropub`
   * Token: whatever you set `LOCALIZE_BLOG_TOKEN` to
+
+  The preview is at `http://localhost:4000/`.
 
   Every successful create / update / delete rebuilds `_site/` automatically
   from the current contents of `priv/posts/`. Publishing to Cloudflare R2
@@ -28,8 +33,11 @@ defmodule Mix.Tasks.Blog.Server do
 
   @impl Mix.Task
   def run(argv) do
-    {options, _, _} = OptionParser.parse(argv, switches: [port: :integer])
-    port = Keyword.get(options, :port, 4010)
+    {options, _, _} =
+      OptionParser.parse(argv, switches: [api_port: :integer, preview_port: :integer])
+
+    api_port = Keyword.get(options, :api_port, 4010)
+    preview_port = Keyword.get(options, :preview_port, 4000)
 
     unless System.get_env("LOCALIZE_BLOG_TOKEN") do
       Mix.raise("""
@@ -50,27 +58,29 @@ defmodule Mix.Tasks.Blog.Server do
     # other Micropub client) reads during autodetection. A later
     # `mix blog.publish` run from a fresh shell will not see this override
     # and will rebuild with the production URL.
-    micropub_url = "http://localhost:#{port}/micropub"
+    micropub_url = "http://localhost:#{api_port}/micropub"
     Application.put_env(:elixir_localize, :micropub_url, micropub_url)
 
     Mix.shell().info([:cyan, "→ Rebuilding _site/ with local micropub URL…"])
     {:ok, _} = ElixirLocalize.Generator.build("_site", ElixirLocalize.RuntimePosts.all())
 
+    children = Server.child_specs(api_port, preview_port)
+
     {:ok, _pid} =
-      Supervisor.start_link([Server.child_spec(port)], strategy: :one_for_one)
+      Supervisor.start_link(children, strategy: :one_for_one)
 
     Mix.shell().info([
       :green,
-      "✓ Micropub server ",
+      "✓ Preview   ",
       :reset,
-      "listening on #{micropub_url}"
+      "http://localhost:#{preview_port}/"
     ])
 
     Mix.shell().info([
-      :cyan,
-      "  Blog ID for MarsEdit: ",
+      :green,
+      "✓ Micropub  ",
       :reset,
-      ElixirLocalize.site_config()[:base_url]
+      micropub_url
     ])
 
     Mix.shell().info("Press Ctrl+C twice to stop.")
