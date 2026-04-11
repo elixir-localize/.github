@@ -1,7 +1,7 @@
-defmodule ElixirLocalize.RssTest do
+defmodule StaticBlog.RssTest do
   use ExUnit.Case, async: true
 
-  alias ElixirLocalize.{Post, Rss}
+  alias StaticBlog.{Post, Rss}
 
   @site [
     title: "Localize",
@@ -41,7 +41,6 @@ defmodule ElixirLocalize.RssTest do
     assert xml =~ "Hello &lt;world&gt;"
     assert xml =~ "A summary with &lt;tags&gt; &amp; ampersands"
     assert xml =~ "https://blog.localize.dev/posts/hello/"
-    # CDATA body preserved
     assert xml =~ "<![CDATA[<p>Body & stuff</p>]]>"
   end
 end

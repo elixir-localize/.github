@@ -1,7 +1,7 @@
-defmodule ElixirLocalize.MicropubTest do
+defmodule StaticBlog.MicropubTest do
   use ExUnit.Case, async: false
 
-  alias ElixirLocalize.Micropub
+  alias StaticBlog.Micropub
 
   describe "properties_from_params/1" do
     test "parses a JSON-style Micropub payload" do
@@ -104,21 +104,17 @@ defmodule ElixirLocalize.MicropubTest do
 
       File.mkdir_p!(tmp)
 
-      original_app_dir = :code.lib_dir(:elixir_localize)
-      # RuntimePosts resolves via Application.app_dir(:elixir_localize, "priv/posts").
-      # Redirect by creating a fake priv/posts under a temp app dir is too invasive;
-      # instead we rely on the real app dir and clean up files we created.
       on_exit(fn ->
         File.rm_rf!(tmp)
-        # Best-effort cleanup of test posts
-        :elixir_localize
+
+        :localize_blog
         |> Application.app_dir("priv/posts")
         |> Path.join("*-test-micropub-*.md")
         |> Path.wildcard()
         |> Enum.each(&File.rm!/1)
       end)
 
-      %{tmp: tmp, app_dir: original_app_dir}
+      %{tmp: tmp}
     end
 
     test "writes a new post file and returns its canonical URL" do
@@ -134,7 +130,7 @@ defmodule ElixirLocalize.MicropubTest do
       assert url =~ "/"
 
       {:ok, slug} = Micropub.slug_from_url(url)
-      path = ElixirLocalize.RuntimePosts.path_for_slug(slug)
+      path = StaticBlog.RuntimePosts.path_for_slug(slug)
       assert path != nil
       assert File.exists?(path)
       assert File.read!(path) =~ "Hello from the test suite."
@@ -148,7 +144,7 @@ defmodule ElixirLocalize.MicropubTest do
 
       assert url =~ "/posts/#{slug}/"
 
-      path = ElixirLocalize.RuntimePosts.path_for_slug(slug)
+      path = StaticBlog.RuntimePosts.path_for_slug(slug)
       assert path != nil
       source = File.read!(path)
       assert source =~ "Auto-titled post body"

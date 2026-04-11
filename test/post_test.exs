@@ -1,7 +1,7 @@
-defmodule ElixirLocalize.PostTest do
+defmodule StaticBlog.PostTest do
   use ExUnit.Case, async: true
 
-  alias ElixirLocalize.Post
+  alias StaticBlog.Post
 
   describe "build/3" do
     test "parses date and slug from filename" do

@@ -1,0 +1,13 @@
+name = "localize-blog"
+main = "src/index.js"
+compatibility_date = "2024-09-23"
+account_id = "ec5597b1d6a8fcda09582faab999fc0a"
+
+routes = [
+  { pattern = "elixir-localize.com/*", zone_name = "elixir-localize.com" }
+]
+
+# Bind the R2 bucket so the Worker can fetch objects directly.
+[[r2_buckets]]
+binding = "BUCKET"
+bucket_name = "content"

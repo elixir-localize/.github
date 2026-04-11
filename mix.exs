@@ -1,11 +1,11 @@
-defmodule ElixirLocalize.MixProject do
+defmodule LocalizeBlog.MixProject do
   use Mix.Project
 
   @version "0.1.0"
 
   def project do
     [
-      app: :elixir_localize,
+      app: :localize_blog,
       version: @version,
       elixir: "~> 1.17",
       start_permanent: Mix.env() == :prod,
@@ -25,16 +25,10 @@ defmodule ElixirLocalize.MixProject do
 
   defp deps do
     [
+      {:static_blog, path: "../static_blog"},
       {:nimble_publisher, "~> 1.1"},
       {:makeup_elixir, "~> 0.16"},
-      {:makeup_erlang, "~> 0.1"},
-      {:phoenix_live_view, "~> 1.0"},
-      {:phoenix_html, "~> 4.1"},
-      {:req, "~> 0.5"},
-      {:aws_signature, "~> 0.3"},
-      {:bandit, "~> 1.5"},
-      {:plug, "~> 1.16"},
-      {:xmlrpc, "~> 1.4"}
+      {:makeup_erlang, "~> 0.1"}
     ]
   end
 end

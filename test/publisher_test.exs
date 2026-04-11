@@ -1,7 +1,7 @@
-defmodule ElixirLocalize.PublisherTest do
+defmodule StaticBlog.PublisherTest do
   use ExUnit.Case, async: true
 
-  alias ElixirLocalize.Publisher
+  alias StaticBlog.Publisher
 
   test "content_type/1 maps extensions" do
     assert Publisher.content_type("a/b/index.html") == "text/html; charset=utf-8"
