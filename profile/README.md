@@ -22,6 +22,18 @@ Phoenix and Plug integration for `localize`. Provides locale negotiation plugs, 
 
 A thin wrapper over `localize` that mirrors the JavaScript [Intl](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl) API. Useful for developers moving between Elixir and JavaScript, or for porting existing code that targets `Intl`.
 
+### [localize_person_names](https://github.com/elixir-localize/localize_person_names)
+
+Locale-aware formatting of personal names following the CLDR person name specification. Handles ordering, given/surname conventions, honorifics, and script-specific display rules across locales.
+
+### [localize_phonenumber](https://github.com/elixir-localize/localize_phonenumber)
+
+Parsing, validation, and formatting of international phone numbers using Google's [libphonenumber](https://github.com/google/libphonenumber) metadata, integrated with `localize` for locale-aware display.
+
+### [localize_address](https://github.com/elixir-localize/localize_address)
+
+Locale-aware postal address parsing, validation, and formatting based on the CLDR and Google address metadata, including country-specific field ordering and required components.
+
 ## Design Goals
 
 * **No backend modules.** Locale data is loaded at runtime into [`:persistent_term`](https://www.erlang.org/doc/apps/erts/persistent_term.html) for fast access, removing the compile-time backend generation used by `ex_cldr`.
