@@ -34,6 +34,26 @@ Parsing, validation, and formatting of international phone numbers using Google'
 
 Locale-aware postal address parsing, validation, and formatting based on the CLDR and Google address metadata, including country-specific field ordering and required components.
 
+## Form & User Input Libraries
+
+A family of Phoenix LiveView components for locale-aware form inputs. The components share a common CSS token set, Gettext catalog, and structured validation errors so they look and behave consistently when used together. Server-side parsers accept whatever the user types in their locale's conventions (digit shaping, group/decimal separators, calendar systems, date patterns) and the JS hooks degrade gracefully when their optional peer dependencies are not loaded.
+
+### [localize_inputs_core](https://github.com/elixir-localize/localize_inputs_core)
+
+Shared foundation for the input component family. Hosts the `Localize.Inputs.ValidationError` exception, the `Localize.Inputs.Gettext` backend with shared UI strings (button labels, ARIA labels), and the `--li-*` CSS variable tokens for light and dark mode. You usually don't depend on this directly — it is pulled in transitively by the sibling component packages.
+
+### [localize_number_inputs](https://github.com/elixir-localize/localize_number_inputs)
+
+Locale-aware number-like form inputs for Phoenix LiveView. Provides `<.number_input>` for decimal and integer values with cursor-preserving live formatting via [AutoNumeric](https://autonumeric.org), and `<.unit_input>` paired with a searchable `<.unit_picker>` covering CLDR units of measure (length, mass, volume, …) with locale-specific preferred unit systems (metric, US, UK) and localized unit names.
+
+### [localize_datetime_inputs](https://github.com/elixir-localize/localize_datetime_inputs)
+
+Locale-aware date form inputs for Phoenix LiveView. Provides `<.date_input>` with a popup calendar grid that accepts the locale's CLDR short, medium, long, and full date patterns as well as ISO-8601, plus `<.date_range_input>` and `<.date_range_picker>` for two-date selection with min/max, span, and weekday restrictions. Multi-calendar support (Gregorian, Buddhist, Japanese imperial, Islamic, Persian, Hebrew, ROC, …) is provided through [calendrical](https://github.com/elixir-localize/calendrical), so users can type dates in their locale's calendar and the server parses them correctly.
+
+### [localize_inputs_playground](https://github.com/elixir-localize/localize_inputs_playground)
+
+A standalone deployment wrapper that demonstrates the input components across every CLDR locale, with tabs for input behaviour, server-side parsing, formatting, and locale data. The live instance runs at [localize-inputs-playground.fly.dev](https://localize-inputs-playground.fly.dev). The package can also be embedded into a host Phoenix application's dev router as a `forward` route for local experimentation.
+
 ## Design Goals
 
 * **No backend modules.** Locale data is loaded at runtime into [`:persistent_term`](https://www.erlang.org/doc/apps/erts/persistent_term.html) for fast access, removing the compile-time backend generation used by `ex_cldr`.
