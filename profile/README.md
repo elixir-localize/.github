@@ -20,7 +20,7 @@ Phoenix and Plug integration for `localize`. Provides locale negotiation plugs, 
 
 ### [intl](https://github.com/elixir-localize/intl)
 
-A thin wrapper over `localize` that mirrors the JavaScript [Intl](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl) API. Useful for developers moving between Elixir and JavaScript, or for porting existing code that targets `Intl`.
+A thin shim over `localize` that mirrors the JavaScript [Intl](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl) API — `Intl.NumberFormat`, `Intl.DateTimeFormat`, `Intl.ListFormat`, `Intl.DisplayNames`, `Intl.RelativeTimeFormat`, `Intl.PluralRules`, `Intl.Collator`, `Intl.DurationFormat`, and `Intl.Segmenter`. Module names, function purposes, and option names mirror their JS counterparts, adapted to idiomatic Elixir conventions (snake_case options, `{:ok, result}` / `{:error, reason}` tuples). Useful for developers moving between Elixir and JavaScript, or for porting existing code that targets `Intl`.
 
 ### [localize_person_names](https://github.com/elixir-localize/localize_person_names)
 
@@ -33,6 +33,10 @@ Parsing, validation, and formatting of international phone numbers using Google'
 ### [localize_address](https://github.com/elixir-localize/localize_address)
 
 Locale-aware postal address parsing, validation, and formatting based on the CLDR and Google address metadata, including country-specific field ordering and required components.
+
+### [localize_translate](https://github.com/elixir-localize/localize_translate)
+
+Embeds translations directly into Ecto schemas, storing all of a record's translations in a single JSONB column rather than a separate translations table — avoiding the extra tables and JOINs of the traditional approach. `Localize.Translate` provides the `use` macro for translatable schemas and runtime `translate/2,3` functions with CLDR parent-chain fallback, while the optional `Localize.Translate.QueryBuilder` adds `Ecto.Query` macros for filtering and selecting on translated values in SQL. Continues the work of [`trans`](https://github.com/crbelaus/trans) and [`ex_cldr_trans`](https://github.com/elixir-cldr/cldr_trans) within the `localize` ecosystem.
 
 ## Form & User Input Libraries
 
@@ -53,6 +57,26 @@ Locale-aware date form inputs for Phoenix LiveView. Provides `<.date_input>` wit
 ### [localize_inputs_playground](https://github.com/elixir-localize/localize_inputs_playground)
 
 A standalone deployment wrapper that demonstrates the input components across every CLDR locale, with tabs for input behaviour, server-side parsing, formatting, and locale data. The live instance runs at [localize-inputs-playground.fly.dev](https://localize-inputs-playground.fly.dev). The package can also be embedded into a host Phoenix application's dev router as a `forward` route for local experimentation.
+
+## BEAM Language Bindings
+
+`localize` is a plain BEAM library, so any language that compiles to the BEAM can call it directly — there is no foreign runtime to bridge and no FFI overhead. These packages exist purely for ergonomics: each shapes arguments and results the way its host language expects, so callers write idiomatic code instead of reaching across into Elixir modules by hand.
+
+### [localize_lua](https://github.com/elixir-localize/localize_lua)
+
+Locale-aware formatting for the [Lua](https://hexdocs.pm/lua) (Luerl) VM. Installs a small `localize` table into a Luerl VM so Lua scripts — such as templates rendered by a CMS — can format numbers, currencies, dates, times, units, lists, and MessageFormat 2 messages. The exposed surface is a curated allowlist of pure formatting functions with no filesystem or network access, making it safe to hand to untrusted template authors.
+
+### [localize_lfe](https://github.com/elixir-localize/localize_lfe)
+
+Idiomatic [LFE](https://lfe.io) bindings. The `localize` module speaks LFE's own conventions — charlists, atoms, Erlang date/time tuples, and lisp-case option keys — so lispers write `(localize:currency 1234.56 "EUR")` and the library handles the charlist/binary/atom coercion Localize expects.
+
+### [localize_erl](https://github.com/elixir-localize/localize_erl)
+
+Idiomatic Erlang bindings, exposed as small per-concern modules (`localize_number`, `localize_currency`, `localize_date`, `localize_collation`, …). Binaries in and out, maps for options, Erlang date/time tuples, and `{ok, Binary} | {error, {Tag, Message}}` returns that translate Localize's Elixir exceptions into ordinary Erlang error terms.
+
+### [localize_gleam](https://github.com/elixir-localize/localize_gleam)
+
+Type-safe [Gleam](https://gleam.run) bindings. Options are a typed `Options` record built with record-update syntax, and every fallible call returns a `Result(String, LocalizeError)` whose error is a union you can pattern-match (`InvalidLocale`, `InvalidDate`, `UnknownCurrency`, …). Localize's `{ok, _}`/`{error, _}` maps straight onto Gleam's `Result`.
 
 ## Design Goals
 
