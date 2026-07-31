@@ -22,17 +22,27 @@ Phoenix and Plug integration for `localize`. Provides locale negotiation plugs, 
 
 A thin shim over `localize` that mirrors the JavaScript [Intl](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl) API — `Intl.NumberFormat`, `Intl.DateTimeFormat`, `Intl.ListFormat`, `Intl.DisplayNames`, `Intl.RelativeTimeFormat`, `Intl.PluralRules`, `Intl.Collator`, `Intl.DurationFormat`, and `Intl.Segmenter`. Module names, function purposes, and option names mirror their JS counterparts, adapted to idiomatic Elixir conventions (snake_case options, `{:ok, result}` / `{:error, reason}` tuples). Useful for developers moving between Elixir and JavaScript, or for porting existing code that targets `Intl`.
 
+### [unity](https://github.com/elixir-localize/unity)
+
+A unit conversion calculator inspired by the Unix `units` utility, usable as a library, an escript, or an interactive REPL. Parses and evaluates unit expressions — `3 meters to feet`, `1 gallon + 2 litres`, `100 celsius to fahrenheit` — with dimensional analysis, and formats results through `localize`, so output follows the user's locale conventions. Can import GNU units definition files to extend the unit set.
+
 ### [localize_person_names](https://github.com/elixir-localize/localize_person_names)
 
 Locale-aware formatting of personal names following the CLDR person name specification. Handles ordering, given/surname conventions, honorifics, and script-specific display rules across locales.
 
-### [localize_phonenumber](https://github.com/elixir-localize/localize_phonenumber)
+### [localize_phone_number](https://github.com/elixir-localize/localize_phone_number)
 
 Parsing, validation, and formatting of international phone numbers using Google's [libphonenumber](https://github.com/google/libphonenumber) metadata, integrated with `localize` for locale-aware display.
 
 ### [localize_address](https://github.com/elixir-localize/localize_address)
 
 Locale-aware postal address parsing, validation, and formatting based on the CLDR and Google address metadata, including country-specific field ordering and required components.
+
+### [localize_sql](https://github.com/elixir-localize/localize_sql)
+
+SQL database support for Ecto, in two parts. First, locale-aware PostgreSQL ICU collation: the `collate/1,2` macros apply a `COLLATE` clause — resolved from a Localize language tag by CLDR language matching — to query expressions and comparisons, so results sort and compare by the conventions of the user's locale. Migration helpers create the ICU collations PostgreSQL does not preload (for example German phonebook order, `de-u-co-phonebk`, or case-insensitive and natural-sort collations) and build collation-matched indexes.
+
+Second, Ecto types for the Localize and Elixir data types worth storing structurally rather than flattening to a string: units of measure and money as composite types with database-side aggregates (`sum`, `min`, `max`, `avg`) and arithmetic operators, plus currencies, language tags, territories, scripts, integer and date ranges, and durations. [ex_money_sql](https://github.com/kipcole9/money_sql) builds its money support on the same shared DDL machinery.
 
 ### [localize_translate](https://github.com/elixir-localize/localize_translate)
 
@@ -78,6 +88,16 @@ Idiomatic Erlang bindings, exposed as small per-concern modules (`localize_numbe
 
 Type-safe [Gleam](https://gleam.run) bindings. Options are a typed `Options` record built with record-update syntax, and every fallible call returns a `Result(String, LocalizeError)` whose error is a union you can pattern-match (`InvalidLocale`, `InvalidDate`, `UnknownCurrency`, …). Localize's `{ok, _}`/`{error, _}` maps straight onto Gleam's `Result`.
 
+## Agent Tooling
+
+### [localize_mcp](https://github.com/elixir-localize/localize_mcp)
+
+A Model Context Protocol (MCP) server that exposes the Localize API surface to AI agents — Claude Code, Claude Desktop, Codex, Zed, and any other MCP host. Structured tools cover documentation search and browsing, curated examples, formatter options, closed atom collections, locale resolution, and a whitelisted read-only invocation tool, all backed by BEAM introspection of the exact package versions the host project pins. The optional companions (`calendrical`, `localize_web`, `localize_sql`) are detected at boot and their APIs surfaced when present.
+
+### Claude Code skill
+
+The [localize](https://github.com/elixir-localize/localize) repository ships a [Claude Code skill](https://github.com/elixir-localize/localize/blob/main/skills/localize/SKILL.md) that teaches Claude the library's APIs and localization-first patterns — plural-correct messages instead of string interpolation, locale-aware formatting instead of `Calendar.strftime/3`, collation instead of raw `Enum.sort/1` — with every example execution-verified against the library. Install it as a plugin with `/plugin marketplace add elixir-localize/localize` followed by `/plugin install localize@localize`.
+
 ## Design Goals
 
 * **No backend modules.** Locale data is loaded at runtime into [`:persistent_term`](https://www.erlang.org/doc/apps/erts/persistent_term.html) for fast access, removing the compile-time backend generation used by `ex_cldr`.
@@ -101,4 +121,4 @@ The `ex_cldr` libraries remain supported and will continue to receive maintenanc
 
 ## Status
 
-The libraries are under active development and have been released to hex.pm.
+The core libraries reached 1.0 in July 2026 and are published on hex.pm: `localize`, `calendrical`, `intl`, `unity`, `localize_sql`, `localize_web`, `localize_address`, `localize_phone_number` and `localize_person_names`. The form input components and the MCP server are published and still pre-1.0. Development remains active.
