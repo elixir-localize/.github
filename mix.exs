@@ -9,8 +9,7 @@ defmodule LocalizeBlog.MixProject do
       version: @version,
       elixir: "~> 1.17",
       start_permanent: Mix.env() == :prod,
-      deps: deps(),
-      elixirc_paths: elixirc_paths(Mix.env())
+      deps: deps()
     ]
   end
 
@@ -19,9 +18,6 @@ defmodule LocalizeBlog.MixProject do
       extra_applications: [:logger, :inets, :ssl, :crypto]
     ]
   end
-
-  defp elixirc_paths(:test), do: ["lib", "test/support"]
-  defp elixirc_paths(_), do: ["lib"]
 
   defp deps do
     [
