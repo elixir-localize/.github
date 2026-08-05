@@ -25,8 +25,8 @@ defmodule LocalizeBlog.MixProject do
 
   defp deps do
     [
-      {:static_blog, path: "../static_blog"},
-      {:nimble_publisher, "~> 1.1"},
+      {:static_blog, "~> 0.2"},
+      {:nimble_publisher, "~> 2.1"},
       {:makeup_elixir, "~> 0.16"},
       {:makeup_erlang, "~> 0.1"}
     ]
