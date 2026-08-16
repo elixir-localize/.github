@@ -42,7 +42,7 @@ Locale-aware postal address parsing, validation, and formatting based on the CLD
 
 SQL database support for Ecto, in two parts. First, locale-aware PostgreSQL ICU collation: the `collate/1,2` macros apply a `COLLATE` clause — resolved from a Localize language tag by CLDR language matching — to query expressions and comparisons, so results sort and compare by the conventions of the user's locale. Migration helpers create the ICU collations PostgreSQL does not preload (for example German phonebook order, `de-u-co-phonebk`, or case-insensitive and natural-sort collations) and build collation-matched indexes.
 
-Second, Ecto types for the Localize and Elixir data types worth storing structurally rather than flattening to a string: units of measure and money as composite types with database-side aggregates (`sum`, `min`, `max`, `avg`) and arithmetic operators, plus currencies, language tags, territories, scripts, integer and date ranges, and durations. [ex_money_sql](https://github.com/kipcole9/money_sql) builds its money support on the same shared DDL machinery.
+Second, Ecto types for the Localize and Elixir data types worth storing structurally rather than flattening to a string: units of measure and money as composite types with database-side aggregates (`sum`, `min`, `max`, `avg`) and arithmetic operators, plus currencies, language tags, territories, scripts, integer and date ranges, and durations. [ex_money_sql](https://github.com/ex-money/money_sql) builds its money support on the same shared DDL machinery.
 
 ### [localize_translate](https://github.com/elixir-localize/localize_translate)
 
@@ -66,7 +66,13 @@ Locale-aware date form inputs for Phoenix LiveView. Provides `<.date_input>` wit
 
 ### [localize_inputs_playground](https://github.com/elixir-localize/localize_inputs_playground)
 
-A standalone deployment wrapper that demonstrates the input components across every CLDR locale, with tabs for input behaviour, server-side parsing, formatting, and locale data. The live instance runs at [localize-inputs-playground.fly.dev](https://localize-inputs-playground.fly.dev). The package can also be embedded into a host Phoenix application's dev router as a `forward` route for local experimentation.
+A standalone deployment wrapper that demonstrates the input components across every CLDR locale, with tabs for input behaviour, server-side parsing, formatting, and locale data. The live instance runs at [localize-inputs-playground.fly.dev](https://localize-inputs-playground.fly.dev). It can also be embedded into a host Phoenix application's dev router as a `forward` route for local experimentation. The playgrounds are deliberately not published to hex, so it is installed as a git dependency — `{:localize_inputs_playground, github: "elixir-localize/localize_inputs_playground", only: :dev}`.
+
+## Applications
+
+### [localize_pad](https://github.com/elixir-localize/localize_pad)
+
+A notepad calculator in the spirit of [Soulver](https://soulver.app): you type a problem the way you would write it on paper and the answer appears in the margin. What distinguishes it is that it *reads* the user's language rather than merely formatting in it — `1.234,5 Meter in Kilometer`, `20 % von 700`, `10 juin + 3 semaines` — so changing locale re-parses and re-formats the entire sheet across 500+ CLDR locales and 18 calendars. It also answers the temporal questions people actually get stuck on: every Friday the 13th from 2027, when London, New York and Tokyo are all at work, whether Friday is a workday (yes in the US, no in Saudi Arabia). Built on `localize`, `calendrical`, `unity`, `localize_web`, [tempo](https://github.com/elixir-tempo/tempo) and [ex_money](https://github.com/ex-money/money), and deployed as a Phoenix LiveView app at [pad.elixir-localize.com](https://pad.elixir-localize.com) — there is no account and nothing is stored on the server: a sheet lives in the browser and sharing one puts it in the URL fragment.
 
 ## BEAM Language Bindings
 
@@ -119,6 +125,14 @@ The `ex_cldr` libraries remain supported and will continue to receive maintenanc
 * Elixir 1.17 or later
 * Erlang/OTP 26 or later
 
+`localize_pad` is the exception: it requires Erlang/OTP 27 or later, because [tempo](https://github.com/elixir-tempo/tempo) does not support OTP 26.
+
 ## Status
 
-The core libraries reached 1.0 in July 2026 and are published on hex.pm: `localize`, `calendrical`, `intl`, `unity`, `localize_sql`, `localize_web`, `localize_address`, `localize_phone_number` and `localize_person_names`. The form input components and the MCP server are published and still pre-1.0. Development remains active.
+The core libraries reached 1.0 in July 2026 and are published on hex.pm: `localize`, `calendrical`, `intl`, `unity`, `localize_sql`, `localize_web`, `localize_address`, `localize_phone_number` and `localize_person_names`. The Lua binding, `localize_lua`, reached 1.0 alongside them.
+
+Published and still pre-1.0: `localize_translate`, the form input components (`localize_inputs_core`, `localize_number_inputs` and `localize_datetime_inputs`), and the MCP server, `localize_mcp`.
+
+The LFE, Erlang and Gleam bindings (`localize_lfe`, `localize_erl`, `localize_gleam`) are in development and not yet published. The applications — `localize_inputs_playground` and `localize_pad` — are not published to hex by design: they are deployed, or installed from git.
+
+Development remains active.
